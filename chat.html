@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>Chat Generator</title>
+
+<!-- PNG 저장용 라이브러리 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<style>
+body {
+    background:#fff5f3;
+    color:#333333;
+    font-family:sans-serif;
+    padding:20px;
+}
+
+textarea {
+    width:100%;
+    height:150px;
+    margin-bottom:10px;
+}
+
+.chat {
+    margin-top:20px;
+    padding:20px; /* PNG 여백용 */
+    background:#fff5f3; /* PNG 배경 유지 */
+}
+
+.msg {
+    padding:10px;
+    border-radius:10px;
+    margin-bottom:10px;
+    color:#333333;
+}
+
+.meta {
+    font-size:12px;
+    opacity:0.7;
+    margin-bottom:5px;
+}
+</style>
+</head>
+
+<body>
+
+<h3>텍스트 붙여넣기</h3>
+<textarea id="input"></textarea><br>
+
+<button onclick="generate()">♥️변환</button>
+<button onclick="copyHTML()">💛HTML 복사</button>
+<button onclick="savePNG()">📸PNG 저장</button>
+
+<div class="chat" id="chat"></div>
+
+<script>
+// 사용자별 스타일 지정
+const userStyle = {
+    "장모": { bg: "#ffe4d7" },
+    "가지": { bg: "#fff9d5" }
+};
+
+// 기본 스타일
+const defaultStyle = { bg: "#f4f4f4" };
+
+// 메시지 생성
+function createMsg(data){
+    const div = document.createElement("div");
+    div.className = "msg";
+
+    const style = userStyle[data.name] || defaultStyle;
+
+    div.style.background = style.bg;
+    div.style.color = "#333333";
+
+    div.innerHTML = `
+        <div class="meta">${data.name} — ${data.time}</div>
+        <div class="text"></div>
+    `;
+
+    return div;
+}
+
+// 변환 함수
+function generate(){
+    const input = document.getElementById("input").value;
+    const lines = input.split("\n");
+    const chat = document.getElementById("chat");
+    chat.innerHTML = "";
+
+    let current = null;
+
+    lines.forEach(line => {
+        const match = line.match(/^(.+?) — (.+)$/);
+
+        if(match){
+            current = {
+                name: match[1],
+                time: match[2],
+                text: ""
+            };
+            chat.appendChild(createMsg(current));
+        } else if(current){
+            current.text += (current.text ? "<br>" : "") + line;
+            chat.lastChild.querySelector(".text").innerHTML = current.text;
+        }
+    });
+}
+
+// HTML 복사 (스타일 포함)
+function copyHTML(){
+    const style = `
+    <style>
+    .chat { margin-top:20px; }
+    .msg {
+        padding:10px !important;
+        border-radius:10px !important;
+        margin-bottom:10px !important;
+        color:#333333 !important;
+    }
+    .meta {
+        font-size:12px !important;
+        opacity:0.7 !important;
+        margin-bottom:5px !important;
+    }
+    </style>
+    `;
+
+    const chat = document.getElementById("chat").innerHTML;
+    navigator.clipboard.writeText(style + chat);
+    alert("🍒HTML 복사 완료🍋");
+}
+
+// PNG 저장
+function savePNG(){
+    const chat = document.getElementById("chat");
+
+    html2canvas(chat, { scale: 1 }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = "chat.png";
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    });
+}
+</script>
+
+</body>
+</html>
