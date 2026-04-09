@@ -63,6 +63,26 @@ const userStyle = {
 // 기본 스타일
 const defaultStyle = { bg: "#f4f4f4" };
 
+// 디스코드 이모티콘 파싱
+function parseEmoji(text){
+    return text
+        // GIF 이모티콘
+        .replace(/<a:([a-zA-Z0-9_]+):(\d+)>/g, (m, name, id) => {
+            return `<img src="https://cdn.discordapp.com/emojis/${id}.gif"
+                         alt="${name}"
+                         style="height:20px; vertical-align:middle;"
+                         onerror="this.replaceWith(document.createTextNode(':${name}:'))">`;
+        })
+        
+        // 일반 이모티콘
+        .replace(/<:([a-zA-Z0-9_]+):(\d+)>/g, (m, name, id) => {
+            return `<img src="https://cdn.discordapp.com/emojis/${id}.png"
+                         alt="${name}"
+                         style="height:20px; vertical-align:middle;"
+                         onerror="this.replaceWith(document.createTextNode(':${name}:'))">`;
+        });
+}
+
 // 메시지 생성
 function createMsg(data){
     const div = document.createElement("div");
@@ -101,7 +121,7 @@ function generate(){
             };
             chat.appendChild(createMsg(current));
         } else if(current){
-            current.text += (current.text ? "<br>" : "") + line;
+            current.text += (current.text ? "<br>" : "") + parseEmoji(line);
             chat.lastChild.querySelector(".text").innerHTML = current.text;
         }
     });
