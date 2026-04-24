@@ -112,24 +112,40 @@ function generate(){
     chat.innerHTML = "";
 
     let current = null;
+    let lastName = null;
 
     lines.forEach(line => {
         const match = line.match(/^(.+?) — (.+)$/);
 
         if(match){
+            const name = match[1];
+            const time = match[2];
+
+            // 👉 같은 사람이면 "이어쓰기 모드"만 유지
+            if(current && lastName === name){
+                // 아무것도 안 하고 계속 이어서 텍스트만 붙이게 둠
+                return;
+            }
+
+            // 👉 다른 사람이면 새 박스
             current = {
-                name: match[1],
-                time: match[2],
+                name: name,
+                time: time,
                 text: ""
             };
+
             chat.appendChild(createMsg(current));
-        } else if(current){
-            current.text += (current.text ? "<br>" : "") + parseEmoji(line);
-            chat.lastChild.querySelector(".text").innerHTML = current.text;
-        }
+            lastName = name;
+
+        } else if(current && line.trim() !== ""){
+    current.text += (current.text ? "<br>" : "") + parseEmoji(line);
+    const lastMsg = chat.lastElementChild;
+    if(lastMsg){
+    lastMsg.querySelector(".text").innerHTML = current.text;
+}
+}
     });
 }
-
 // HTML 복사 (스타일 포함)
 function copyHTML(){
     const style = `
