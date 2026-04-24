@@ -42,41 +42,6 @@ textarea {
     opacity:0.7;
     margin-bottom:5px;
 }
-<style>
-body {
-    background:#fff5f3;
-    color:#333333;
-    font-family:sans-serif;
-    padding:20px;
-}
-
-textarea {
-    width:100%;
-    height:150px;
-    margin-bottom:10px;
-}
-
-.chat {
-    margin-top:20px;
-    padding:20px;
-    background:#fff5f3;
-}
-
-.msg {
-    padding:10px;
-    border-radius:10px;
-    margin-bottom:10px;
-    color:#333333;
-
-    word-break: break-all;
-    overflow-wrap: break-word;
-}
-
-.meta {
-    font-size:12px;
-    opacity:0.7;
-    margin-bottom:5px;
-}
 
 /* 버튼 디자인 */
 button {
@@ -143,7 +108,7 @@ function parseEmoji(text){
 // 하이퍼링크 연결
 function parseLink(text){
     return text.replace(
-        /(https?:\/\/[^\s]+)/g,
+        /(https?:\/\/[^\s<"]+)/g,
         (url) => `<a href="${url}" target="_blank" style="color:#ff8a8a; text-decoration:none;">${url}</a>`
     );
 }
@@ -200,7 +165,8 @@ function generate(){
             lastName = name;
 
         } else if(current && line.trim() !== ""){
-    current.text += (current.text ? "<br>" : "") + parseLink(parseEmoji(line));
+    current.text += (current.text ? "<br>" : "") 
+    + parseEmoji(parseLink(line));
     const lastMsg = chat.lastElementChild;
     if(lastMsg){
     lastMsg.querySelector(".text").innerHTML = current.text;
