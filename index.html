@@ -125,7 +125,6 @@ const defaultStyle = { bg: "#f4f4f4" };
 // 디스코드 이모티콘 파싱
 function parseEmoji(text){
     return text
-        // GIF 이모티콘
         .replace(/<a:([a-zA-Z0-9_]+):(\d+)>/g, (m, name, id) => {
             return `<img src="https://cdn.discordapp.com/emojis/${id}.gif"
                          alt="${name}"
@@ -133,13 +132,20 @@ function parseEmoji(text){
                          onerror="this.replaceWith(document.createTextNode(':${name}:'))">`;
         })
         
-        // 일반 이모티콘
         .replace(/<:([a-zA-Z0-9_]+):(\d+)>/g, (m, name, id) => {
             return `<img src="https://cdn.discordapp.com/emojis/${id}.png"
                          alt="${name}"
                          style="height:20px; vertical-align:middle;"
                          onerror="this.replaceWith(document.createTextNode(':${name}:'))">`;
         });
+}
+
+// 하이퍼링크 연결
+function parseLink(text){
+    return text.replace(
+        /(https?:\/\/[^\s]+)/g,
+        (url) => `<a href="${url}" target="_blank" style="color:#ff8a8a; text-decoration:none;">${url}</a>`
+    );
 }
 
 // 메시지 생성
@@ -194,7 +200,7 @@ function generate(){
             lastName = name;
 
         } else if(current && line.trim() !== ""){
-    current.text += (current.text ? "<br>" : "") + parseEmoji(line);
+    current.text += (current.text ? "<br>" : "") + parseLink(parseEmoji(line));
     const lastMsg = chat.lastElementChild;
     if(lastMsg){
     lastMsg.querySelector(".text").innerHTML = current.text;
